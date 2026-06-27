@@ -133,6 +133,15 @@ docker compose exec app flask shell
 python verify_phase1.py   # Modelos de datos
 python verify_phase2.py   # Backend API + endpoints
 python verify_phase3.py   # Frontend HTML + estaticos
+python verify_phase4.py   # Docker / Dokploy
+python verify_phase5.py   # Multi-tenancy
+python verify_phase6.py   # Suscripciones
+```
+
+O ejecutar la suite de tests con pytest:
+
+```bash
+pytest
 ```
 
 ---
@@ -161,9 +170,15 @@ python verify_phase3.py   # Frontend HTML + estaticos
 - Revisa los labels de Traefik en `docker-compose.yml`.
 
 ### Migraciones fallan
-- Si es primer despliegue, el entrypoint usa `flask init-db` como fallback.
+- El despliegue ejecuta `flask db upgrade` automaticamente.
+- En produccion, si `flask db upgrade` falla, el contenedor falla (no hay fallback oculto).
+- Para desarrollo local o primer despliegue, define `ALLOW_INIT_DB_FALLBACK=1` para usar `flask init-db`.
 - Para reiniciar la BD: `docker compose down -v` (borra el volumen).
 - Verifica permisos del usuario `medcenter` sobre `/app/migrations`.
+
+### Datos demo
+- Para cargar datos demo al iniciar el contenedor, define `SEED_DEMO_DATA=1`.
+- Tambien puedes ejecutar manualmente: `docker compose exec app flask seed`.
 
 ### Cookies JWT no funcionan
 - En produccion, `JWT_COOKIE_SECURE=true` requiere HTTPS.

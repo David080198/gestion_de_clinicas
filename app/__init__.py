@@ -173,5 +173,7 @@ def _register_cli_commands(app: Flask) -> None:
 
     @app.cli.command("seed")
     def seed_db() -> None:
-        """Puebla la base con datos demo (Fase 2)."""
-        print("Seed pendiente de implementacion (Fase 2).")
+        """Puebla la base con datos demo (super-admin + clinica demo)."""
+        from seed_data import run as run_seed
+        run_seed()
+        print("Seed de datos demo completado.")

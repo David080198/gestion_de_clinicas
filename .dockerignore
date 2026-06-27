@@ -28,9 +28,8 @@ build/
 htmlcov/
 .tox/
 
-# Migrations locales (Alembic las regenera en el contenedor)
-migrations/versions/*.py
-!migrations/versions/.gitkeep
+# Alembic migrations deben viajar en la imagen Docker
+# NO ignorar archivos de migración
 
 # IDE
 .vscode/

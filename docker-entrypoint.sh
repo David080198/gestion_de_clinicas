@@ -1,14 +1,19 @@
 #!/bin/sh
 # ============================================================
 # docker-entrypoint.sh
-# Punto de entrada del contenedor Flask en Dokploy.
+# Punto de entrada del contenedor Flask en produccion (Dokploy).
 #
 # Tareas:
-#   1. Espera a que PostgreSQL este listo (healthcheck).
-#   2. Construye DATABASE_URL si no fue inyectada por Dokploy.
-#   3. Ejecuta migraciones de Alembic (Flask-Migrate).
-#   4. Opcionalmente aplica seed de datos demo.
-#   5. Arranca Gunicorn con la configuracion de produccion.
+#   1. Espera a que PostgreSQL este listo.
+#   2. Construye DATABASE_URL si no fue inyectada.
+#   3. Ejecuta migraciones de Alembic (flask db upgrade).
+#   4. Opcionalmente aplica seed de datos demo (SEED_DEMO_DATA=1).
+#   5. Arranca Gunicorn.
+#
+# Seguridad:
+#   - En produccion, si `flask db upgrade` falla, el contenedor falla.
+#   - El fallback `flask init-db` SOLO se activa si
+#     ALLOW_INIT_DB_FALLBACK=1 (util en primer despliegue local).
 # ============================================================
 set -e
 
@@ -17,7 +22,7 @@ echo "  MedCenter Premium - Iniciando contenedor"
 echo "============================================"
 
 # ------------------------------------------------------------
-# 1. Construir DATABASE_URL si no existe (compatibilidad Dokploy)
+# 1. Construir DATABASE_URL si no existe
 # ------------------------------------------------------------
 if [ -z "${DATABASE_URL}" ] && [ -n "${POSTGRES_HOST}" ]; then
     export DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
@@ -25,7 +30,7 @@ if [ -z "${DATABASE_URL}" ] && [ -n "${POSTGRES_HOST}" ]; then
 fi
 
 if [ -z "${DATABASE_URL}" ]; then
-    echo "[entrypoint] ERROR: DATABASE_URL no definida. Define DATABASE_URL o POSTGRES_* en Dokploy."
+    echo "[entrypoint] ERROR: DATABASE_URL no definida. Define DATABASE_URL o POSTGRES_* en el entorno."
     exit 1
 fi
 
@@ -64,21 +69,30 @@ done
 echo "[entrypoint] PostgreSQL listo."
 
 # ------------------------------------------------------------
-# 3. Ejecutar migraciones (Flask-Migrate / Alembic)
+# 3. Ejecutar migraciones de Alembic
 # ------------------------------------------------------------
 echo "[entrypoint] Aplicando migraciones de base de datos..."
-flask db upgrade 2>/dev/null || {
-    echo "[entrypoint] No hay migraciones o fallaron. Creando tablas directamente..."
-    flask init-db
-}
-echo "[entrypoint] Base de datos lista."
+if flask db upgrade; then
+    echo "[entrypoint] Migraciones aplicadas correctamente."
+else
+    echo "[entrypoint] ERROR: flask db upgrade fallo."
+    if [ "${ALLOW_INIT_DB_FALLBACK}" = "1" ]; then
+        echo "[entrypoint] ALLOW_INIT_DB_FALLBACK=1: creando tablas directamente..."
+        flask init-db
+        echo "[entrypoint] Tablas creadas."
+    else
+        echo "[entrypoint] Para usar el fallback init-db, define ALLOW_INIT_DB_FALLBACK=1."
+        exit 1
+    fi
+fi
 
 # ------------------------------------------------------------
-# 4. Seed opcional ( solo si SEED_DEMO_DATA=1 )
+# 4. Seed opcional (solo si SEED_DEMO_DATA=1)
 # ------------------------------------------------------------
 if [ "${SEED_DEMO_DATA}" = "1" ]; then
     echo "[entrypoint] Aplicando datos demo..."
-    flask seed 2>/dev/null || echo "[entrypoint] Seed omitido (pendiente Fase 2)."
+    flask seed
+    echo "[entrypoint] Datos demo aplicados."
 fi
 
 # ------------------------------------------------------------

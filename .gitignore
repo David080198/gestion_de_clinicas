@@ -1,7 +1,9 @@
-# Entorno
+# Entorno (NUNCA versionar secrets)
 .env
 .env.local
 .env.*.local
+.env.production
+.env.staging
 
 # Python
 __pycache__/
@@ -19,9 +21,9 @@ ENV/
 .coverage
 htmlcov/
 
-# Migrations locales
-migrations/versions/*.py
-!migrations/versions/.gitkeep
+# Alembic migrations (versionar SIEMPRE en producción)
+migrations/__pycache__/
+migrations/versions/__pycache__/
 
 # IDE
 .vscode/
