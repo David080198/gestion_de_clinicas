@@ -19,8 +19,8 @@ views_bp: Blueprint = Blueprint("views", __name__)
 
 @views_bp.route("/")
 def index():
-    """Health check del servicio."""
-    return jsonify({"status": "ok", "service": "medical-clinic"})
+    """Página de bienvenida / landing page."""
+    return render_template("welcome.html")
 
 
 @views_bp.route("/health")
