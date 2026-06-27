@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Mis Recetas - MedCenter{% endblock %}
+{% block page_title %}Recetas Medicas{% endblock %}
+
+{% block content %}
+<div id="prescriptions-view" class="space-y-6">
+    <div id="loading">
+        <div class="card-premium p-6">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+        </div>
+    </div>
+    <div id="prescriptions-content" class="hidden"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const PrescriptionsView = {
+    async init() {
+        const user = await AppAuth.requireAuth();
+        if (!user) return;
+
+        // Obtener patient_id
+        let patientId;
+        if (user.role === 'paciente') {
+            patientId = user.patient_profile?.id;
+            if (!patientId) {
+                Toasts.error('No tienes perfil de paciente');
+                return;
+            }
+        } else if (user.role === 'medico' || user.role === 'admin') {
+            // Para medicos/admin: mostrar todas las recetas recientes
+            // Por simplicidad, se listan via dashboard
+            Toasts.info('Como medico, accede a las recetas desde el expediente del paciente');
+            setTimeout(() => window.location.href = '/dashboard', 1500);
+            return;
+        }
+
+        await this.load(patientId);
+    },
+
+    async load(patientId) {
+        const container = document.getElementById('prescriptions-content');
+        document.getElementById('loading').classList.add('hidden');
+        container.classList.remove('hidden');
+
+        try {
+            const data = await Api.get(Endpoints.medical.patientPrescriptions(patientId));
+            const items = data.items || [];
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="card-premium p-12 text-center">
+                        <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="text-slate-500">No tienes recetas emitidas</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = items.map(rx => `
+                <div class="card-premium p-6 hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <p class="text-lg font-bold text-slate-800">${rx.code}</p>
+                            <p class="text-sm text-slate-500">${Utils.formatDate(rx.issued_at)}</p>
+                        </div>
+                        <span class="badge bg-primary-100 text-primary-700">${rx.item_count} medicamentos</span>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-xs text-slate-400">Medico</p>
+                        <p class="text-sm font-semibold text-slate-800">${rx.doctor_name}</p>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        ${rx.medications.map(m => `
+                            <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-3">
+                                <svg class="w-5 h-5 text-primary-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-slate-800">${m.name}</p>
+                                    <p class="text-xs text-slate-500">
+                                        ${m.dose ? m.dose + ' | ' : ''}${m.frequency || ''} ${m.duration ? '| ' + m.duration : ''}
+                                    </p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ${rx.notes ? `<p class="text-sm text-slate-600 mb-4"><strong>Indicaciones:</strong> ${rx.notes}</p>` : ''}
+                    <button onclick="PrescriptionsView.downloadPdf('${rx.code}')" class="btn-primary text-sm w-full justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                        Descargar PDF
+                    </button>
+                </div>
+            `).join('');
+        } catch (err) {
+            container.innerHTML = `<div class="card-premium p-6 text-center text-red-500">${err.message}</div>`;
+        }
+    },
+
+    async downloadPdf(code) {
+        try {
+            Toasts.info('Generando PDF...');
+            const blob = await Api.download(Endpoints.medical.prescriptionPdf(code));
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `receta_${code}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            Toasts.success('PDF descargado');
+        } catch (err) {
+            Toasts.error('Error al descargar: ' + err.message);
+        }
+    },
+};
+
+document.addEventListener('DOMContentLoaded', () => PrescriptionsView.init());
+</script>
+{% endblock %}

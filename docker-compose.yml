@@ -1,0 +1,157 @@
+# ============================================================
+# docker-compose.yml - MedCenter Premium
+# Optimizado para despliegue en Dokploy con Traefik interno
+#
+# Caracteristicas clave para Dokploy:
+#   - La app NO publica puertos al host (Traefik enruta via labels)
+#   - PostgreSQL usa volumen nombrado para persistencia
+#   - Healthchecks para que Dokploy monitoree los servicios
+#   - Labels de Traefik para enrutamiento y SSL automatico
+#   - Variables de entorno inyectadas por Dokploy de forma segura
+#   - Red externa "dokploy-network" gestionada por Dokploy
+# ============================================================
+
+services:
+  # ============================================================
+  # Aplicacion Flask (Gunicorn)
+  # ============================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medcenter-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Estas variables pueden ser sobreescritas por Dokploy
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-clinic_user}:${POSTGRES_PASSWORD:-clinic_password}@db:5432/${POSTGRES_DB:-clinic_db}
+      - POSTGRES_USER=${POSTGRES_USER:-clinic_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-clinic_password}
+      - POSTGRES_DB=${POSTGRES_DB:-clinic_db}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - APP_PORT=${APP_PORT:-5000}
+      - JWT_COOKIE_SECURE=${JWT_COOKIE_SECURE:-true}
+      - JWT_COOKIE_CSRF_PROTECT=${JWT_COOKIE_CSRF_PROTECT:-true}
+      - CLINIC_NAME=${CLINIC_NAME:-MedCenter Premium}
+      - SEED_DEMO_DATA=${SEED_DEMO_DATA:-0}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+      - dokploy-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    # NO exponemos puertos al host: Traefik gestiona el enrutamiento
+    # expose hace el puerto accesible solo dentro de la red de Docker
+    expose:
+      - "5000"
+    labels:
+      # ===== Traefik (Dokploy) =====
+      - "traefik.enable=true"
+      # Router HTTP (redirige a HTTPS automaticamente)
+      - "traefik.http.routers.medcenter.rule=Host(`${DOMAIN:-medcenter.local}`)"
+      - "traefik.http.routers.medcenter.entrypoints=web"
+      - "traefik.http.routers.medcenter.middlewares=https-redirect"
+      # Router HTTPS (SSL automatico via Let's Encrypt de Dokploy)
+      - "traefik.http.routers.medcenter-secure.rule=Host(`${DOMAIN:-medcenter.local}`)"
+      - "traefik.http.routers.medcenter-secure.entrypoints=websecure"
+      - "traefik.http.routers.medcenter-secure.tls=true"
+      - "traefik.http.routers.medcenter-secure.tls.certresolver=letsencrypt"
+      # Puerto interno del contenedor
+      - "traefik.http.services.medcenter.loadbalancer.server.port=5000"
+      - "traefik.http.services.medcenter.loadbalancer.server.scheme=http"
+      # Middleware de redireccion HTTPS
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      # Headers de seguridad
+      - "traefik.http.middlewares.security-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.security-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.security-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.routers.medcenter-secure.middlewares=security-headers"
+      # Prioridad para que el router especifico gane sobre wildcards
+      - "traefik.http.routers.medcenter.priority=100"
+      - "traefik.http.routers.medcenter-secure.priority=100"
+    volumes:
+      # Logs persistentes (opcional)
+      - app-logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================
+  # Base de datos PostgreSQL
+  # ============================================================
+  db:
+    image: postgres:16-alpine
+    container_name: medcenter-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-clinic_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinic_password}
+      POSTGRES_DB: ${POSTGRES_DB:-clinic_db}
+      # Tuning basico para rendimiento
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+    networks:
+      - internal
+    # NO exponemos el puerto 5432 al host por seguridad
+    # Solo accesible dentro de la red interna de Docker
+    expose:
+      - "5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-clinic_user} -d ${POSTGRES_DB:-clinic_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    # Opcional: tunear PostgreSQL para clinica (conexiones limitadas)
+    command: >
+      postgres
+        -c max_connections=100
+        -c shared_buffers=128MB
+        -c effective_cache_size=256MB
+        -c log_min_duration_statement=1000
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# ============================================================
+# Redes
+# ============================================================
+networks:
+  # Red interna para app <-> db (no accesible externamente)
+  internal:
+    driver: bridge
+  # Red externa de Dokploy (gestionada por Dokploy/Traefik)
+  # Dokploy crea esta red automaticamente; si el nombre difiere,
+  # ajustarlo en el panel de Dokploy o crearla con: docker network create dokploy-network
+  dokploy-network:
+    external: true
+    name: ${DOKPLOY_NETWORK:-dokploy-network}
+
+# ============================================================
+# Volumenes persistentes
+# ============================================================
+volumes:
+  pgdata:
+    driver: local
+    name: medcenter-pgdata
+  app-logs:
+    driver: local
+    name: medcenter-logs

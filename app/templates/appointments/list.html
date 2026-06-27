@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Mis Citas - MedCenter{% endblock %}
+{% block page_title %}Mis Citas{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Filtros -->
+    <div class="card-premium p-4">
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+            <select id="status-filter" class="input-premium flex-1" onchange="AppointmentsList.load()">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="confirmada">Confirmada</option>
+                <option value="en_consulta">En consulta</option>
+                <option value="completada">Completada</option>
+                <option value="cancelada">Cancelada</option>
+            </select>
+            <input type="date" id="date-filter" class="input-premium" onchange="AppointmentsList.load()">
+            <button onclick="AppointmentsList.clearFilters()" class="btn-secondary text-sm">Limpiar</button>
+        </div>
+    </div>
+
+    <!-- Lista -->
+    <div id="appointments-list">
+        <div class="card-premium p-6">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const AppointmentsList = {
+    async load() {
+        const status = document.getElementById('status-filter').value;
+        const date = document.getElementById('date-filter').value;
+        let url = Endpoints.appointments.list + '?';
+        if (status) url += `status=${status}&`;
+        if (date) url += `start=${date}T00:00:00&end=${date}T23:59:59&`;
+
+        const container = document.getElementById('appointments-list');
+        Skeletons.show(container, Skeletons.table(5));
+
+        try {
+            const data = await Api.get(url);
+            const items = data.items || [];
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="card-premium p-12 text-center">
+                        <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="text-slate-500">No hay citas que mostrar</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="card-premium overflow-hidden">
+                    <table class="table-premium">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>${AppAuth.currentUser?.role === 'medico' ? 'Paciente' : 'Medico'}</th>
+                                <th>Motivo</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.map(a => `
+                                <tr class="cursor-pointer" onclick="window.location.href='/appointments/${a.id}'">
+                                    <td class="font-medium text-slate-800">${Utils.formatDate(a.start_time, false)}</td>
+                                    <td>${Utils.formatTime(a.start_time)}</td>
+                                    <td>${AppAuth.currentUser?.role === 'medico' ? (a.patient_name || '-') : (a.doctor_name || '-')}</td>
+                                    <td class="text-slate-500">${a.reason || '-'}</td>
+                                    <td>${Utils.statusBadge(a.status)}</td>
+                                    <td><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        } catch (err) {
+            container.innerHTML = `<div class="card-premium p-6 text-center text-red-500">${err.message}</div>`;
+        }
+    },
+
+    clearFilters() {
+        document.getElementById('status-filter').value = '';
+        document.getElementById('date-filter').value = '';
+        this.load();
+    },
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await AppAuth.requireAuth();
+    AppointmentsList.load();
+});
+</script>
+{% endblock %}

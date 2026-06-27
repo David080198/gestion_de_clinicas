@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Calendario - MedCenter{% endblock %}
+{% block page_title %}Calendario de Citas{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Controles del calendario -->
+    <div class="card-premium p-6">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+
+            <!-- Navegacion de mes -->
+            <div class="flex items-center gap-3">
+                <button onclick="CalendarView.prevMonth()" class="p-2 rounded-xl hover:bg-slate-100 transition-colors">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+                </button>
+                <h2 id="calendar-month-label" class="text-xl font-bold text-slate-800 min-w-[180px] text-center"></h2>
+                <button onclick="CalendarView.nextMonth()" class="p-2 rounded-xl hover:bg-slate-100 transition-colors">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="CalendarView.today()" class="btn-secondary text-sm">Hoy</button>
+                <button id="new-appointment-btn" onclick="window.location.href='/appointments/new'" class="btn-primary text-sm hidden">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    Nueva cita
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grilla del calendario -->
+    <div class="card-premium p-4 overflow-x-auto">
+        <!-- Dias de la semana -->
+        <div class="grid grid-cols-7 gap-1 mb-2">
+            {% for day in ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'] %}
+            <div class="text-center text-xs font-bold text-slate-500 uppercase tracking-wide py-2">{{ day }}</div>
+            {% endfor %}
+        </div>
+        <!-- Celdas del calendario (se inyectan via JS) -->
+        <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+            <div class="col-span-7 space-y-2 p-4">
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600">
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-200"></span> Pendiente</div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-200"></span> Confirmada</div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-primary-300"></span> En consulta</div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-200"></span> Completada</div>
+        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-200"></span> Cancelada</div>
+    </div>
+</div>
+
+<!-- Modal de detalle de cita -->
+<div id="appointment-modal" class="modal-overlay hidden" onclick="CalendarView.closeModal(event)">
+    <div class="modal-content p-6" onclick="event.stopPropagation()">
+        <div id="modal-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock %}

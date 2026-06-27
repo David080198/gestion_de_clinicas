@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Nueva Cita - MedCenter{% endblock %}
+{% block page_title %}Agendar Cita{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <!-- Formulario -->
+    <div class="card-premium p-8">
+        <h2 class="text-xl font-bold text-slate-800 mb-2">Solicitar nueva cita</h2>
+        <p class="text-sm text-slate-500 mb-6">Selecciona el medico, fecha y horario disponible</p>
+
+        <form id="appointment-form" class="space-y-6">
+
+            <!-- Medico -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Medico *</label>
+                <select id="doctor-select" required class="input-premium" onchange="AppointmentForm.onDoctorChange()">
+                    <option value="">Selecciona un medico...</option>
+                </select>
+                <div id="doctor-info" class="mt-3 hidden">
+                    <div class="flex items-center gap-3 bg-primary-50 rounded-xl p-3">
+                        <div class="w-10 h-10 rounded-full bg-primary-200 text-primary-800 flex items-center justify-center font-semibold" id="doctor-avatar">D</div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800" id="doctor-name"></p>
+                            <p class="text-xs text-slate-500" id="doctor-specialty"></p>
+                        </div>
+                        <div class="ml-auto text-right">
+                            <p class="text-sm font-bold text-primary-600" id="doctor-fee"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fecha -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Fecha *</label>
+                <input type="date" id="appointment-date" required class="input-premium" onchange="AppointmentForm.onDateChange()">
+                <p class="text-xs text-slate-400 mt-1">Solo se muestran dias con horario de atencion</p>
+            </div>
+
+            <!-- Slots disponibles -->
+            <div id="slots-section" class="hidden">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Horario disponible *</label>
+                <div id="slots-container" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                    <div class="skeleton h-10 rounded-lg"></div>
+                    <div class="skeleton h-10 rounded-lg"></div>
+                    <div class="skeleton h-10 rounded-lg"></div>
+                    <div class="skeleton h-10 rounded-lg"></div>
+                </div>
+            </div>
+
+            <!-- Motivo -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Motivo de la consulta</label>
+                <textarea id="reason" rows="3" class="input-premium" placeholder="Describe brevemente el motivo de tu visita..."></textarea>
+            </div>
+
+            <!-- Submit -->
+            <div class="flex gap-3">
+                <a href="/appointments/calendar" class="btn-secondary flex-1 justify-center">Cancelar</a>
+                <button type="submit" id="submit-btn" class="btn-primary flex-1 justify-center" disabled>
+                    <span id="submit-text">Agendar cita</span>
+                    <div id="submit-spinner" class="spinner hidden"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/appointment_form.js') }}"></script>
+{% endblock %}

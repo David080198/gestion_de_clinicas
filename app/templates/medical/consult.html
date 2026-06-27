@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Consulta Medica - MedCenter{% endblock %}
+{% block page_title %}Consulta Medica{% endblock %}
+
+{% block content %}
+<div id="consult-view" class="max-w-5xl mx-auto space-y-6">
+
+    <!-- Skeleton inicial -->
+    <div id="loading">
+        <div class="card-premium p-6">
+            <div class="skeleton h-8 w-64 mb-4"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+        </div>
+    </div>
+
+    <!-- Contenido real -->
+    <div id="consult-content" class="hidden"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/consult.js') }}"></script>
+{% endblock %}

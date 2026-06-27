@@ -1,0 +1,21 @@
+# ============================================================
+# docker-compose.override.yml - Override para desarrollo local
+#
+# Docker Compose fusiona este archivo automaticamente con
+# docker-compose.yml. Solo aplica en local; NO afecta el
+# despliegue en Dokploy (alli no se sube este archivo).
+#
+# Publica el puerto 5000 al host para acceder desde el navegador
+# y desactiva Traefik (no se necesita en local).
+# ============================================================
+
+services:
+  app:
+    ports:
+      - "8090:5000"
+    labels:
+      # Desactivar Traefik en local
+      - "traefik.enable=false"
+
+  # db: No exponemos PostgreSQL al host (el puerto 5432 suele estar ocupado)
+  # Para inspeccionar la BD usa: docker compose exec db psql -U clinic_user -d clinic_db
