@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Clínica - MedCenter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: { primary: { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81' } },
+                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+            }}
+        }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="h-full bg-gradient-to-br from-slate-50 via-slate-50 to-indigo-50">
+    <div id="toast-container"></div>
+
+    <div class="min-h-full flex flex-col items-center justify-center px-4 py-12">
+        <!-- Decorative blur background -->
+        <div class="absolute inset-0 -z-10 overflow-hidden">
+            <div class="absolute top-20 right-1/4 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-20 left-1/4 w-96 h-96 bg-primary-300/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <!-- Card container -->
+        <div class="w-full max-w-2xl">
+            
+            <!-- Logo and title -->
+            <div class="text-center mb-10">
+                <a href="/" class="inline-flex justify-center mb-4 hover:opacity-80 transition">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-16 w-auto">
+                </a>
+                <p class="text-slate-500 mb-4">Tu plataforma de gestion medica digital</p>
+                <a href="/register-type" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Cambiar tipo de cuenta
+                </a>
+            </div>
+
+            <!-- Form card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-6">
+                
+                <div class="mb-8">
+                    <h2 class="text-xl font-semibold text-slate-800 mb-1">Registro de Clínica/Consultorio</h2>
+                    <p class="text-slate-500 text-sm">Crea tu cuenta para comenzar a gestionar tu consulta médica</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="clinic-register-form" class="space-y-5">
+
+                    <!-- Datos de la clínica -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Nombre de la Clínica/Consultorio *</label>
+                        <input type="text" id="clinic_name" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Ej: Clínica MedCenter">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">RIF / Registro Fiscal *</label>
+                            <input type="text" id="tax_id" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="J-12345678-0">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Teléfono principal *</label>
+                            <input type="tel" id="clinic_phone" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="+58 212 1234567">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Dirección *</label>
+                        <input type="text" id="address" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Avenida Principal, Piso 5, Oficina 501">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Ciudad *</label>
+                            <input type="text" id="city" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Caracas">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Estado/Región *</label>
+                            <input type="text" id="state" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Distrito Capital">
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-200">
+
+                    <!-- Datos del responsable -->
+                    <p class="text-sm font-semibold text-slate-800 uppercase tracking-wide">Responsable/Administrador</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Nombre(s) *</label>
+                            <input type="text" id="first_name" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Juan">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Apellido(s) *</label>
+                            <input type="text" id="last_name" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Perez">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Correo electronico *</label>
+                            <input type="email" id="email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="admin@clinica.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Teléfono personal</label>
+                            <input type="tel" id="phone" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="+58 412 1234567">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Contraseña *</label>
+                        <input type="password" id="password" required minlength="8" class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400" placeholder="Minimo 8 caracteres">
+                    </div>
+
+                    <button type="submit" id="clinic-register-btn" class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+                        <span id="clinic-register-text">Crear cuenta de clínica</span>
+                        <div id="clinic-register-spinner" class="spinner hidden"></div>
+                    </button>
+                </form>
+
+                <!-- Enlace a login -->
+                <p class="mt-8 text-center text-sm text-slate-600">
+                    ¿Ya tienes cuenta?
+                    <a href="/login" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">Inicia sesión</a>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-10 text-center">
+                <p class="text-xs text-slate-400 mb-3">&copy; 2026 MedCenter. Todos los derechos reservados.</p>
+                <a href="https://codexsoto.com/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-700 transition text-xs">
+                    <span>Powered by</span>
+                    <span class="font-semibold">CodexSoto</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/toasts.js') }}"></script>
+    <script>
+        document.getElementById('clinic-register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('clinic-register-btn');
+            const text = document.getElementById('clinic-register-text');
+            const spinner = document.getElementById('clinic-register-spinner');
+            btn.disabled = true;
+            text.textContent = 'Creando...';
+            spinner.classList.remove('hidden');
+
+            const payload = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                first_name: document.getElementById('first_name').value,
+                last_name: document.getElementById('last_name').value,
+                phone: document.getElementById('phone').value || null,
+                role: 'clinica',
+                clinic_name: document.getElementById('clinic_name').value,
+                tax_id: document.getElementById('tax_id').value,
+                clinic_phone: document.getElementById('clinic_phone').value,
+                address: document.getElementById('address').value,
+                city: document.getElementById('city').value,
+                state: document.getElementById('state').value,
+            };
+
+            try {
+                await Api.post('/api/auth/register-clinic', payload);
+                Toasts.success('Clínica registrada. Iniciando sesion...');
+                // Auto-login tras registro
+                setTimeout(async () => {
+                    try {
+                        await Api.post(Endpoints.auth.login, {
+                            email: payload.email,
+                            password: payload.password,
+                        });
+                        window.location.href = '/dashboard';
+                    } catch (e) {
+                        window.location.href = '/login';
+                    }
+                }, 800);
+            } catch (err) {
+                Toasts.error(err.message || 'Error al registrar clínica');
+                btn.disabled = false;
+                text.textContent = 'Crear cuenta de clínica';
+                spinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
