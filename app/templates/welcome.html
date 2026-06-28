@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedCenter Premium - Tu Clinica Digital</title>
-    <script src="https://cdn.tailwindcss.com"><\/script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { font-family: "Inter", sans-serif; }
@@ -383,6 +383,6 @@
     function removeTyping(){const t=document.getElementById('typing-indicator');if(t)t.remove();}
     function handleOption(action){document.getElementById('quick-options')?.remove();const resp=responses[action];if(!resp)return;if(resp.redirect){window.location.href=resp.redirect;return;}addMessage(action.replace(/_/g,' '),true);showTyping();setTimeout(()=>{removeTyping();addMessage(resp.text);if(resp.options)addOptions(resp.options);},800);}
     function sendMessage(){const input=document.getElementById('chat-input');const text=input.value.trim();if(!text)return;input.value='';addMessage(text,true);showTyping();const lower=text.toLowerCase();let action='default';if(lower.match(/cita|agendar|reserv|turno/))action='agendar';else if(lower.match(/especialid|medico|doctor/))action='especialidad';else if(lower.match(/cuenta|registr/))action='cuenta';else if(lower.match(/precio|costo|plan|gratis/))action='precios';else if(lower.match(/hola|buenos|hi|hello/))action='saludo';const resp=responses[action]||responses['default'];setTimeout(()=>{removeTyping();if(action==='saludo'){addMessage('Hola! En que puedo ayudarte hoy?');addOptions([{label:'Agendar cita',action:'agendar'},{label:'Crear cuenta',action:'cuenta'},{label:'Especialidades',action:'especialidad'}]);}else{addMessage(resp.text);if(resp.options)addOptions(resp.options);}},900);}
-<\/script>
+</script>
 </body>
 </html>
