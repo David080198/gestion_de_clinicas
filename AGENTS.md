@@ -95,6 +95,14 @@ pytest
 - `docker-compose.override.yml` publica el puerto `8090` en local y desactiva Traefik.
 - El `docker-entrypoint.sh` ejecuta migraciones y arranca Gunicorn.
 
+## Stripe
+
+- La integracion con Stripe esta en `app/services/stripe_service.py` y `app/api/stripe.py`.
+- Se soportan suscripciones recurrentes, checkout session, customer portal y webhooks.
+- Los Price IDs de Stripe se configuran con variables de entorno (`STRIPE_PRICE_*`).
+- Nunca versionar `STRIPE_SECRET_KEY` ni `STRIPE_WEBHOOK_SECRET`.
+- Webhook endpoint: `POST /api/stripe/webhook`.
+
 ## Testing
 
 - Preferir crear tests pytest en `tests/`.

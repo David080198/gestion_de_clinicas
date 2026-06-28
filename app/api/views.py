@@ -39,10 +39,22 @@ def login_page():
     return render_template("auth/login.html")
 
 
+@views_bp.route("/register-type")
+def register_type_page():
+    """Pagina de seleccion de tipo de cuenta (paciente o clinica)."""
+    return render_template("auth/register_type.html")
+
+
 @views_bp.route("/register")
 def register_page():
     """Pagina de registro de paciente."""
     return render_template("auth/register.html")
+
+
+@views_bp.route("/register-clinic")
+def register_clinic_page():
+    """Pagina de registro de clinica."""
+    return render_template("auth/register_clinic.html")
 
 
 # ============================================================

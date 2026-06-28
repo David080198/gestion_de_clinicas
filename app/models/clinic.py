@@ -73,13 +73,21 @@ class Clinic(BaseModel):
 
     # --- Contacto ---
     address: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    city: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    state: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
     email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    tax_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     timezone: Mapped[str] = mapped_column(String(50), default="America/Mexico_City")
     currency: Mapped[str] = mapped_column(String(10), default="MXN")
 
     # --- Negocio ---
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+    # --- Pasarelas de pago ---
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(
+        String(120), nullable=True, index=True
+    )
 
     # --- Relaciones ---
     users: Mapped[list["User"]] = relationship(

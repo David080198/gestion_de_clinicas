@@ -97,6 +97,14 @@ class Subscription(BaseModel):
         Numeric(10, 2), nullable=True,
     )
 
+    # --- Stripe ---
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(
+        String(120), nullable=True, index=True
+    )
+    stripe_price_id: Mapped[Optional[str]] = mapped_column(
+        String(120), nullable=True
+    )
+
     # --- Relaciones ---
     clinic: Mapped["Clinic"] = relationship("Clinic")
     invoices: Mapped[list["Invoice"]] = relationship(

@@ -16,6 +16,7 @@ class UserRole(enum.Enum):
     MEDICO = "medico"
     RECEPCIONISTA = "recepcionista"
     PACIENTE = "paciente"
+    CLINICA = "clinica"
 
 
 class Gender(enum.Enum):

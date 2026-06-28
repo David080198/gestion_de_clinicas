@@ -40,10 +40,27 @@ define al menos:
 | `DOMAIN` | `medcenter.tudominio.com` | Dominio asignado por Dokploy |
 | `JWT_COOKIE_SECURE` | `true` | Cookies seguras tras HTTPS |
 | `SEED_DEMO_DATA` | `0` o `1` | `1` para cargar datos demo |
+| `STRIPE_SECRET_KEY` | `sk_live_...` | Clave secreta de Stripe |
+| `STRIPE_PUBLISHABLE_KEY` | `pk_live_...` | Clave publica de Stripe |
+| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Secret del webhook de Stripe |
+| `STRIPE_PRICE_*` | `price_...` | Price IDs de cada plan/ciclo |
 
 Dokploy inyecta estas variables de forma segura (no quedan en el repo).
 
-### 4. Red de Dokploy (Traefik)
+### 4. Configurar Stripe (opcional pero recomendado)
+
+Si vas a cobrar suscripciones con Stripe:
+
+1. Crea productos y precios recurrentes en el [dashboard de Stripe](https://dashboard.stripe.com/products).
+2. Configura un webhook apuntando a `https://medcenter.tudominio.com/api/stripe/webhook`.
+3. Selecciona estos eventos:
+   - `checkout.session.completed`
+   - `invoice.payment_succeeded`
+   - `invoice.payment_failed`
+   - `customer.subscription.deleted`
+4. Copia el webhook secret y las variables de entorno en Dokploy.
+
+### 5. Red de Dokploy (Traefik)
 
 Dokploy gestiona Traefik y crea una red Docker llamada `dokploy-network`
 por defecto. El `docker-compose.yml` referencia esta red como `external`.

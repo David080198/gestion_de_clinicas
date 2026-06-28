@@ -77,6 +77,29 @@ class BaseConfig:
     DEFAULT_PAGE_SIZE: int = 20
     MAX_PAGE_SIZE: int = 100
 
+    # --- Stripe ---
+    STRIPE_SECRET_KEY: str = os.environ.get("STRIPE_SECRET_KEY", "")
+    STRIPE_PUBLISHABLE_KEY: str = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+    STRIPE_WEBHOOK_SECRET: str = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+    STRIPE_PRICE_STARTER_MONTHLY: str = os.environ.get(
+        "STRIPE_PRICE_STARTER_MONTHLY", ""
+    )
+    STRIPE_PRICE_STARTER_YEARLY: str = os.environ.get(
+        "STRIPE_PRICE_STARTER_YEARLY", ""
+    )
+    STRIPE_PRICE_PROFESSIONAL_MONTHLY: str = os.environ.get(
+        "STRIPE_PRICE_PROFESSIONAL_MONTHLY", ""
+    )
+    STRIPE_PRICE_PROFESSIONAL_YEARLY: str = os.environ.get(
+        "STRIPE_PRICE_PROFESSIONAL_YEARLY", ""
+    )
+    STRIPE_PRICE_CLINIC_MONTHLY: str = os.environ.get(
+        "STRIPE_PRICE_CLINIC_MONTHLY", ""
+    )
+    STRIPE_PRICE_CLINIC_YEARLY: str = os.environ.get(
+        "STRIPE_PRICE_CLINIC_YEARLY", ""
+    )
+
 
 class DevelopmentConfig(BaseConfig):
     """Configuracion para desarrollo local."""

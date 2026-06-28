@@ -147,6 +147,7 @@ def _register_blueprints(app: Flask) -> None:
     from .api.dashboard import dashboard_bp
     from .api.clinics import clinics_bp
     from .api.subscriptions import subscriptions_bp
+    from .api.stripe import stripe_bp
     from .api.views import views_bp
 
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -155,10 +156,11 @@ def _register_blueprints(app: Flask) -> None:
     app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
     app.register_blueprint(clinics_bp, url_prefix="/api/clinics")
     app.register_blueprint(subscriptions_bp, url_prefix="/api/subscriptions")
+    app.register_blueprint(stripe_bp)
     app.register_blueprint(views_bp)
 
     app.logger.info(
-        "Blueprints registrados: auth, appointments, medical, dashboard, clinics, subscriptions, views."
+        "Blueprints registrados: auth, appointments, medical, dashboard, clinics, subscriptions, stripe, views."
     )
 
 

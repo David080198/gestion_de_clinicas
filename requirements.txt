@@ -30,6 +30,9 @@ flask-marshmallow==1.2.1
 # --- Generacion de PDF ---
 reportlab==4.2.0
 
+# --- Pasarelas de pago ---
+stripe==9.8.0
+
 # --- Logging / Monitoreo ---
 structlog==24.2.0
 

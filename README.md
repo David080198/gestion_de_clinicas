@@ -9,6 +9,7 @@ Sistema de gestion integral para clinicas y consultorios medicos multirrol.
 - **Autenticacion:** JWT en cookies HttpOnly + CSRF
 - **Frontend:** Tailwind CSS + JavaScript vanilla (Jinja2)
 - **Servidor WSGI:** Gunicorn
+- **Pasarela de pagos:** Stripe (suscripciones y webhooks)
 - **Contenedores:** Docker + Docker Compose
 - **Despliegue recomendado:** Dokploy + Traefik + SSL automatico
 
@@ -108,6 +109,43 @@ Resumen rapido:
    - `DOMAIN`
 4. Desplegar. Dokploy/Traefik gestionan SSL y el enrutamiento.
 
+## Configuracion de Stripe
+
+Para cobrar suscripciones con Stripe:
+
+1. Crear cuenta en [Stripe](https://stripe.com).
+2. Crear productos y precios recurrentes en el dashboard.
+3. Configurar el webhook apuntando a `https://tudominio.com/api/stripe/webhook`.
+4. Copiar las variables en `.env`:
+
+```bash
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_STARTER_MONTHLY=price_...
+STRIPE_PRICE_STARTER_YEARLY=price_...
+STRIPE_PRICE_PROFESSIONAL_MONTHLY=price_...
+STRIPE_PRICE_PROFESSIONAL_YEARLY=price_...
+STRIPE_PRICE_CLINIC_MONTHLY=price_...
+STRIPE_PRICE_CLINIC_YEARLY=price_...
+```
+
+Eventos de webhook soportados:
+
+- `checkout.session.completed`
+- `invoice.payment_succeeded`
+- `invoice.payment_failed`
+- `customer.subscription.deleted`
+
+Endpoints de Stripe:
+
+| Metodo | Endpoint | Descripcion |
+|--------|----------|-------------|
+| GET | `/api/stripe/config` | Publishable key |
+| POST | `/api/stripe/checkout-session` | Crear sesion de checkout |
+| POST | `/api/stripe/customer-portal` | Portal de gestion de pago |
+| POST | `/api/stripe/webhook` | Webhook de Stripe |
+
 ## Variables de entorno principales
 
 | Variable | Descripcion | Obligatoria |
@@ -120,6 +158,9 @@ Resumen rapido:
 | `POSTGRES_DB` | Nombre de la BD | Si |
 | `DOMAIN` | Dominio para Traefik | Si (en Dokploy) |
 | `JWT_COOKIE_SECURE` | Cookies seguras (HTTPS) | Si (produccion) |
+| `STRIPE_SECRET_KEY` | Clave secreta de Stripe | Si (pagos) |
+| `STRIPE_PUBLISHABLE_KEY` | Clave publica de Stripe | Si (pagos) |
+| `STRIPE_WEBHOOK_SECRET` | Secret del webhook de Stripe | Si (pagos) |
 | `SEED_DEMO_DATA` | Cargar datos demo al inicio | No |
 | `ALLOW_INIT_DB_FALLBACK` | Fallback `init-db` si migraciones fallan | No (dev only) |
 
