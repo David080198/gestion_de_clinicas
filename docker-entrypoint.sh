@@ -111,13 +111,41 @@ echo "[entrypoint] Aplicando migraciones de base de datos..."
 if flask db upgrade; then
     echo "[entrypoint] Migraciones aplicadas correctamente."
 else
-    echo "[entrypoint] ERROR: flask db upgrade fallo."
-    if [ "${ALLOW_INIT_DB_FALLBACK}" = "1" ]; then
+    echo "[entrypoint] WARN: flask db upgrade fallo. Diagnosticando..."
+
+    # Detectar si la BD ya existe pero sin historial de Alembic.
+    # Esto ocurre cuando las tablas fueron creadas por db.create_all()
+    # (ej: primer despliegue con ALLOW_INIT_DB_FALLBACK=1) y los ENUMs
+    # de PostgreSQL ya existen, causando el error "type already exists".
+    HAS_ALEMBIC=$(python -c "
+import psycopg2, os, sys
+try:
+    conn = psycopg2.connect(os.environ['DATABASE_URL'])
+    cur = conn.cursor()
+    cur.execute(\"SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name='alembic_version')\")
+    print('yes' if cur.fetchone()[0] else 'no')
+    conn.close()
+except Exception as e:
+    print('error')
+    sys.exit(1)
+")
+
+    if [ "$HAS_ALEMBIC" = "no" ]; then
+        # La BD tiene tablas (creadas por db.create_all) pero sin historial
+        # de migraciones. Marcamos como HEAD para que futuros deploys apliquen
+        # solo migraciones incrementales sin re-crear lo que ya existe.
+        echo "[entrypoint] BD sin historial Alembic detectada (creada por init-db)."
+        echo "[entrypoint] Marcando schema actual como revision HEAD..."
+        flask db stamp head
+        echo "[entrypoint] ✓ BD adoptada por Alembic. Proximos deploys aplicaran solo migraciones nuevas."
+    elif [ "${ALLOW_INIT_DB_FALLBACK}" = "1" ]; then
         echo "[entrypoint] ALLOW_INIT_DB_FALLBACK=1: creando tablas directamente..."
         flask init-db
-        echo "[entrypoint] Tablas creadas."
+        flask db stamp head
+        echo "[entrypoint] Tablas creadas y marcadas como head."
     else
-        echo "[entrypoint] Para usar el fallback init-db, define ALLOW_INIT_DB_FALLBACK=1."
+        echo "[entrypoint] ERROR: flask db upgrade fallo y no hay fallback configurado."
+        echo "[entrypoint] Opciones: define ALLOW_INIT_DB_FALLBACK=1 o RESET_DATABASE=1."
         exit 1
     fi
 fi
