@@ -40,9 +40,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <a href="/" class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-600/30">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                </div>
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-9 w-auto rounded-lg">
                 <span class="text-xl font-bold text-primary-900">MedCenter</span>
             </a>
             <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
