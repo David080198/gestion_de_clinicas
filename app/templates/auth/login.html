@@ -3,120 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesion - MedCenter Premium</title>
+    <title>Iniciar Sesion - MedCenter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: { extend: {
                 colors: { primary: { 50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81' } },
-                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], display: ['DM Serif Display', 'serif'] }
+                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
             }}
         }
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="h-full bg-slate-50">
+<body class="h-full bg-gradient-to-br from-slate-50 via-slate-50 to-indigo-50">
     <div id="toast-container"></div>
 
-    <div class="min-h-full flex">
-
-        <!-- ============================ Panel izquierdo ============================ -->
-        <div class="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-between p-12 relative overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900">
-
-            <!-- Formas decorativas organicas -->
-            <div class="absolute top-20 right-10 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl animate-float"></div>
-            <div class="absolute bottom-10 left-0 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl"></div>
-            <div class="absolute top-1/2 right-1/3 w-40 h-40 bg-blue-400/10 rounded-full blur-2xl"></div>
-
-            <!-- Logo -->
-            <div class="relative z-10 flex items-center gap-3">
-                <div>
-                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-12 w-auto">
-                    <p class="text-[11px] text-indigo-200/70 mt-2 tracking-wide">PREMIUM MEDICAL TECH</p>
-                </div>
-            </div>
-
-            <!-- Mensaje central con tipografia mixta -->
-            <div class="relative z-10 max-w-md">
-                <h2 class="text-3xl font-bold text-white leading-tight mb-3 tracking-tight">
-                    La gestion de tu clinica,
-                    <span class="font-display italic text-indigo-200">finalmente</span> simple.
-                </h2>
-                <p class="text-indigo-200/70 leading-relaxed text-sm">
-                    Agenda inteligente, expedientes clinicos electronicos,
-                    recetas digitales y reportes financieros. Todo en una
-                    plataforma disenada para clinicians, no contra ellos.
-                </p>
-
-                <!-- Features con iconos refinados -->
-                <div class="mt-8 space-y-3.5">
-                    <div class="flex items-center gap-3 text-indigo-100/80">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-400/15 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <span class="text-sm">Calendario sin colisiones con slots en tiempo real</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-indigo-100/80">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-400/15 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <span class="text-sm">Expedientes clinicos inmutables y auditables</span>
-                    </div>
-                    <div class="flex items-center gap-3 text-indigo-100/80">
-                        <div class="w-7 h-7 rounded-lg bg-emerald-400/15 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <span class="text-sm">Recetas electronicas con descarga PDF profesional</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer con branding CodexSoto -->
-            <div class="relative z-10 flex items-center justify-between">
-                <div class="text-indigo-300/40 text-xs">
-                    &copy; 2026 MedCenter Premium
-                </div>
-                <a href="https://codexsoto.com/" target="_blank" rel="noopener" class="codexsoto-brand text-indigo-200/50 hover:text-white">
-                    <span>Powered by</span>
-                    <span class="font-semibold tracking-tight">CodexSoto</span>
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
-            </div>
+    <div class="min-h-full flex flex-col items-center justify-center px-4 py-12">
+        <!-- Decorative blur background -->
+        <div class="absolute inset-0 -z-10 overflow-hidden">
+            <div class="absolute top-20 right-1/4 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-20 left-1/4 w-96 h-96 bg-primary-300/10 rounded-full blur-3xl"></div>
         </div>
 
-        <!-- ============================ Panel derecho ============================ -->
-        <div class="flex-1 flex flex-col justify-center px-6 lg:px-16 py-12 bg-white">
-
-            <div class="mx-auto w-full max-w-md">
-
-                <!-- Logo mobile -->
-                <div class="lg:hidden flex items-center justify-center mb-10">
-                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-11 w-auto">
+        <!-- Card container -->
+        <div class="w-full max-w-md">
+            
+            <!-- Logo and title -->
+            <div class="text-center mb-10">
+                <div class="flex justify-center mb-6">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-16 w-auto">
                 </div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">MedCenter</h1>
+                <p class="text-slate-500">Tu plataforma de gestion medica digital</p>
+            </div>
 
+            <!-- Form card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 mb-6">
+                
                 <div class="mb-8">
-                    <h1 class="text-2xl font-bold text-slate-800 mb-1.5 tracking-tight">Bienvenido de nuevo</h1>
-                    <p class="text-slate-400 text-sm">Inicia sesion para acceder a tu panel</p>
+                    <h2 class="text-xl font-semibold text-slate-800 mb-1">Bienvenido de nuevo</h2>
+                    <p class="text-slate-500 text-sm">Inicia sesion para acceder a tu panel</p>
                 </div>
 
                 <!-- Formulario -->
                 <form id="login-form" class="space-y-5">
 
                     <div>
-                        <label for="email" class="block text-[13px] font-semibold text-slate-600 mb-1.5">Correo electronico</label>
+                        <label for="email" class="block text-sm font-semibold text-slate-700 mb-2">Correo electronico</label>
                         <input type="email" id="email" name="email" required
-                               class="input-premium"
+                               class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400"
                                placeholder="doctor@clinica.com"
                                autocomplete="email">
                     </div>
 
                     <div>
-                        <label for="password" class="block text-[13px] font-semibold text-slate-600 mb-1.5">Contrasena</label>
+                        <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">Contrasena</label>
                         <div class="relative">
                             <input type="password" id="password" name="password" required
-                                   class="input-premium pr-10"
+                                   class="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition text-slate-900 placeholder-slate-400 pr-10"
                                    placeholder="Minimo 8 caracteres"
                                    autocomplete="current-password">
                             <button type="button" onclick="Utils.togglePassword('password', this)"
@@ -129,35 +76,36 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between text-sm">
-                        <label class="flex items-center gap-2 text-slate-500 cursor-pointer select-none">
-                            <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 transition">
-                            <span class="text-[13px]">Recordarme</span>
+                    <div class="flex items-center justify-between pt-2">
+                        <label class="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
+                            <input type="checkbox" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500/20 transition">
+                            <span class="text-sm">Recordarme</span>
                         </label>
-                        <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium text-[13px] transition-colors">Olvidaste tu contrasena?</a>
+                        <a href="#" class="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors">¿Olvidaste tu contraseña?</a>
                     </div>
 
                     <button type="submit" id="login-btn"
-                            class="btn-primary w-full justify-center">
+                            class="w-full py-2.5 px-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                         <span id="login-text">Iniciar sesion</span>
                         <div id="login-spinner" class="spinner hidden"></div>
                     </button>
                 </form>
 
                 <!-- Enlace a registro -->
-                <p class="mt-8 text-center text-sm text-slate-400">
-                    Eres paciente nuevo?
-                    <a href="/register" class="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors">Registrate aqui</a>
+                <p class="mt-8 text-center text-sm text-slate-600">
+                    ¿Eres paciente nuevo?
+                    <a href="/register" class="text-primary-600 hover:text-primary-700 font-semibold transition-colors">Registrate aqui</a>
                 </p>
+            </div>
 
-                <!-- Branding CodexSoto en mobile -->
-                <div class="mt-10 flex justify-center lg:hidden">
-                    <a href="https://codexsoto.com/" target="_blank" rel="noopener" class="codexsoto-brand">
-                        <span>Powered by</span>
-                        <span class="font-semibold tracking-tight text-slate-600">CodexSoto</span>
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                </div>
+            <!-- Footer -->
+            <div class="mt-10 text-center">
+                <p class="text-xs text-slate-400 mb-3">&copy; 2026 MedCenter. Todos los derechos reservados.</p>
+                <a href="https://codexsoto.com/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-700 transition text-xs">
+                    <span>Powered by</span>
+                    <span class="font-semibold">CodexSoto</span>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
+                </a>
             </div>
         </div>
     </div>
