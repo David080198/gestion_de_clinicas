@@ -69,7 +69,43 @@ done
 echo "[entrypoint] PostgreSQL listo."
 
 # ------------------------------------------------------------
-# 3. Ejecutar migraciones de Alembic
+# 3. Reset de base de datos (si RESET_DATABASE=1)
+# ------------------------------------------------------------
+if [ "${RESET_DATABASE}" = "1" ]; then
+    echo "[entrypoint] ⚠️  RESET_DATABASE=1: Reseteando base de datos..."
+    python -c "
+import psycopg2
+import os
+from urllib.parse import urlparse
+
+db_url = os.environ.get('DATABASE_URL')
+if db_url:
+    # Parsear DATABASE_URL para obtener credenciales
+    try:
+        # Conectar para resetear
+        conn = psycopg2.connect(db_url)
+        conn.autocommit = True
+        cur = conn.cursor()
+        print('[*] Eliminando schema public...')
+        cur.execute('DROP SCHEMA IF EXISTS public CASCADE;')
+        print('[+] Schema eliminado')
+        print('[*] Recreando schema public...')
+        cur.execute('CREATE SCHEMA public;')
+        cur.execute('GRANT ALL ON SCHEMA public TO postgres;')
+        cur.execute('GRANT ALL ON SCHEMA public TO public;')
+        print('[+] Schema recreado - BD reseteada')
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f'ERROR durante reset: {e}')
+        exit(1)
+"
+    echo "[entrypoint] ✓ Base de datos reseteada exitosamente."
+    echo "[entrypoint] ⚠️  IMPORTANTE: Cambia RESET_DATABASE=0 y reinicia para aplicar migraciones."
+fi
+
+# ------------------------------------------------------------
+# 4. Ejecutar migraciones de Alembic
 # ------------------------------------------------------------
 echo "[entrypoint] Aplicando migraciones de base de datos..."
 if flask db upgrade; then
@@ -87,7 +123,7 @@ else
 fi
 
 # ------------------------------------------------------------
-# 4. Seed opcional (solo si SEED_DEMO_DATA=1)
+# 5. Seed opcional (solo si SEED_DEMO_DATA=1)
 # ------------------------------------------------------------
 if [ "${SEED_DEMO_DATA}" = "1" ]; then
     echo "[entrypoint] Aplicando datos demo..."
@@ -96,7 +132,7 @@ if [ "${SEED_DEMO_DATA}" = "1" ]; then
 fi
 
 # ------------------------------------------------------------
-# 5. Arrancar Gunicorn
-# ------------------------------------------------------------
+# 6. Arrancar Gunicorn
+# -----------------------------------------------
 echo "[entrypoint] Arrancando Gunicorn en el puerto ${APP_PORT:-5000}..."
 exec gunicorn -c gunicorn.conf.py "wsgi:app"
