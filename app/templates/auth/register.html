@@ -23,11 +23,8 @@
         <div class="w-full max-w-2xl">
 
             <!-- Logo -->
-            <div class="flex items-center gap-3 mb-8 justify-center">
-                <div class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                </div>
-                <span class="text-xl font-bold text-primary-900">MedCenter</span>
+            <div class="flex items-center justify-center mb-8">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-12 w-auto">
             </div>
 
             <div class="card-premium p-8">
