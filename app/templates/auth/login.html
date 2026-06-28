@@ -33,10 +33,14 @@
             
             <!-- Logo and title -->
             <div class="text-center mb-10">
-                <div class="flex justify-center mb-4">
+                <a href="/" class="inline-flex justify-center mb-4 hover:opacity-80 transition">
                     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="MedCenter" class="h-16 w-auto">
-                </div>
-                <p class="text-slate-500">Tu plataforma de gestion medica digital</p>
+                </a>
+                <p class="text-slate-500 mb-4">Tu plataforma de gestion medica digital</p>
+                <a href="/" class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-slate-600 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Volver a inicio
+                </a>
             </div>
 
             <!-- Form card -->
